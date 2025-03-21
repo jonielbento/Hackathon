@@ -8,6 +8,7 @@ namespace Hackathon.Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class MedicoController(AppDbContext context) : ControllerBase{
+    
     // GET: api/Medico
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Medico>>> GetMedicos()
@@ -20,7 +21,7 @@ public class MedicoController(AppDbContext context) : ControllerBase{
     }
 
     // GET: api/Medico/{id}
-    [HttpGet("{id}")]
+    [HttpGet("{id:long}")]
     public async Task<ActionResult<Medico>> GetMedico(long id)
     {
         var medico = await context.Medicos.Include(m => m.MedicoLogin)
@@ -44,7 +45,7 @@ public class MedicoController(AppDbContext context) : ControllerBase{
     }
 
     // PUT: api/Medico/{id}
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
     public async Task<IActionResult> PutMedico(long id, Medico medico)
     {
         if (id != medico.IdMedico) return BadRequest();
@@ -56,7 +57,7 @@ public class MedicoController(AppDbContext context) : ControllerBase{
     }
 
     // DELETE: api/Medico/{id}
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
     public async Task<IActionResult> DeleteMedico(long id)
     {
         var medico = await context.Medicos.FindAsync(id);
