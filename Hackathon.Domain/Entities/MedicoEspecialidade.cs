@@ -1,4 +1,4 @@
-﻿namespace Hackathon.Api.Entities
+﻿namespace Hackathon.Domain.Entities
 {
     public class MedicoEspecialidade
     {

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="DataTransfers\Requests\" />
+      <Folder Include="DataTransfers\Responses\" />
+      <Folder Include="Interfaces\" />
+      <Folder Include="Services\" />
+    </ItemGroup>
+
+</Project>

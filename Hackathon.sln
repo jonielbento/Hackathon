@@ -5,6 +5,16 @@ VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hackathon.Api", "Hackathon.Api\Hackathon.Api.csproj", "{72BCF9B1-5182-4E13-A8CA-8A7CCD786605}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hackathon.Infrastructure", "Hackathon.Infrastructure\Hackathon.Infrastructure.csproj", "{79F514EB-C3E3-4141-AF63-8DEEC6ED2742}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hackathon.Domain", "Hackathon.Domain\Hackathon.Domain.csproj", "{558F03FE-2976-4526-AC12-8733EB3BA934}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hackathon.Application", "Hackathon.Application\Hackathon.Application.csproj", "{E274CE50-365B-4634-BEA1-C360BDEFF59C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hackathon.Test", "Hackathon.Test\Hackathon.Test.csproj", "{80A4E91A-E8EB-4F81-A280-E296D6C138BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hackathon.Web", "Hackathon.Web\Hackathon.Web.csproj", "{BD7E780F-E299-4D8B-8D86-35E4679F5C3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +25,26 @@ Global
 		{72BCF9B1-5182-4E13-A8CA-8A7CCD786605}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72BCF9B1-5182-4E13-A8CA-8A7CCD786605}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72BCF9B1-5182-4E13-A8CA-8A7CCD786605}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79F514EB-C3E3-4141-AF63-8DEEC6ED2742}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79F514EB-C3E3-4141-AF63-8DEEC6ED2742}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79F514EB-C3E3-4141-AF63-8DEEC6ED2742}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79F514EB-C3E3-4141-AF63-8DEEC6ED2742}.Release|Any CPU.Build.0 = Release|Any CPU
+		{558F03FE-2976-4526-AC12-8733EB3BA934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{558F03FE-2976-4526-AC12-8733EB3BA934}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{558F03FE-2976-4526-AC12-8733EB3BA934}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{558F03FE-2976-4526-AC12-8733EB3BA934}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E274CE50-365B-4634-BEA1-C360BDEFF59C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E274CE50-365B-4634-BEA1-C360BDEFF59C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E274CE50-365B-4634-BEA1-C360BDEFF59C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E274CE50-365B-4634-BEA1-C360BDEFF59C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80A4E91A-E8EB-4F81-A280-E296D6C138BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80A4E91A-E8EB-4F81-A280-E296D6C138BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80A4E91A-E8EB-4F81-A280-E296D6C138BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80A4E91A-E8EB-4F81-A280-E296D6C138BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD7E780F-E299-4D8B-8D86-35E4679F5C3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD7E780F-E299-4D8B-8D86-35E4679F5C3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD7E780F-E299-4D8B-8D86-35E4679F5C3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD7E780F-E299-4D8B-8D86-35E4679F5C3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
