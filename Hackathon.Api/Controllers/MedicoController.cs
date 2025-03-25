@@ -1,71 +1,73 @@
-using Hackathon.Domain.Entities;
-using Hackathon.Infrastructure.Data;
+using Hackathon.Application.DataTransfers.Requests;
+using Hackathon.Application.DataTransfers.Responses;
+using Hackathon.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Hackathon.Api.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class MedicoController(AppDbContext context) : ControllerBase{
-    
-    // GET: api/Medico
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Medico>>> GetMedicos()
+namespace Hackathon.Api.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class MedicoController : ControllerBase
     {
-        return await context.Medicos.Include(m => m.MedicoLogin)
-            .Include(m => m.MedicoEspecialidades)
-            .Include(m => m.HorariosTrabalho)
-            .Include(m => m.Consultas)
-            .ToListAsync();
-    }
+        private readonly IMedicoService _medicoService;
 
-    // GET: api/Medico/{id}
-    [HttpGet("{id:long}")]
-    public async Task<ActionResult<Medico>> GetMedico(long id)
-    {
-        var medico = await context.Medicos.Include(m => m.MedicoLogin)
-            .Include(m => m.MedicoEspecialidades)
-            .Include(m => m.HorariosTrabalho)
-            .Include(m => m.Consultas)
-            .FirstOrDefaultAsync(m => m.IdMedico == id);
+        public MedicoController(IMedicoService medicoService)
+        {
+            _medicoService = medicoService;
+        }
 
-        if (medico == null) return NotFound();
+        // GET: api/Medico
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MedicoResponse>>> GetMedicos()
+        {
+            return Ok(await _medicoService.GetAllMedicosAsync());
+        }
 
-        return medico;
-    }
+        // GET: api/Medico/{id}
+        [HttpGet("{id:long}")]
+        public async Task<ActionResult<MedicoResponse>> GetMedico(long id)
+        {
+            var medico = await _medicoService.GetMedicoByIdAsync(id);
+            if (medico == null)
+                return NotFound();
 
-    // POST: api/Medico
-    [HttpPost]
-    public async Task<ActionResult<Medico>> PostMedico(Medico medico)
-    {
-        context.Medicos.Add(medico);
-        await context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetMedico), new { id = medico.IdMedico }, medico);
-    }
+            return medico;
+        }
 
-    // PUT: api/Medico/{id}
-    [HttpPut("{id:long}")]
-    public async Task<IActionResult> PutMedico(long id, Medico medico)
-    {
-        if (id != medico.IdMedico) return BadRequest();
+        // POST: api/Medico
+        [HttpPost]
+        public async Task<ActionResult<MedicoResponse>> PostMedico(MedicoRequest medicoRequest)
+        {
+            var medico = await _medicoService.CreateMedicoAsync(medicoRequest);
+            return CreatedAtAction(nameof(GetMedico), new { id = medico.IdMedico }, medico);
+        }
 
-        context.Entry(medico).State = EntityState.Modified;
-        await context.SaveChangesAsync();
+        // PUT: api/Medico/{id}
+        [HttpPut("{id:long}")]
+        public async Task<IActionResult> PutMedico(long id, MedicoRequest medicoRequest)
+        {
+            try
+            {
+                await _medicoService.UpdateMedicoAsync(id, medicoRequest);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-        return NoContent();
-    }
+        // DELETE: api/Medico/{id}
+        [HttpDelete("{id:long}")]
+        public async Task<IActionResult> DeleteMedico(long id)
+        {
+            var result = await _medicoService.DeleteMedicoAsync(id);
+            if (!result)
+                return NotFound();
 
-    // DELETE: api/Medico/{id}
-    [HttpDelete("{id:long}")]
-    public async Task<IActionResult> DeleteMedico(long id)
-    {
-        var medico = await context.Medicos.FindAsync(id);
-        if (medico == null) return NotFound();
-
-        context.Medicos.Remove(medico);
-        await context.SaveChangesAsync();
-
-        return NoContent();
+            return NoContent();
+        }
     }
 }

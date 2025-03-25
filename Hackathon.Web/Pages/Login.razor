@@ -1,0 +1,84 @@
+@page "/login"
+@using Hackathon.Web.Models
+@using Hackathon.Web.Services
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Login - MedConsulta</PageTitle>
+
+<div class="form-container">
+    <h2>Login</h2>
+    
+    <EditForm Model="@loginRequest" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+        
+        <div class="form-group">
+            <label class="form-label">Tipo de Usuário</label>
+            <div>
+                <input type="radio" id="paciente" name="tipoUsuario" value="Paciente" 
+                       @onchange="@(() => loginRequest.TipoUsuario = "Paciente")" checked />
+                <label for="paciente">Paciente</label>
+                
+                <input type="radio" id="medico" name="tipoUsuario" value="Medico" 
+                       @onchange="@(() => loginRequest.TipoUsuario = "Medico")" />
+                <label for="medico">Médico</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">@(loginRequest.TipoUsuario == "Medico" ? "CRM" : "Email ou CPF")</label>
+            <InputText @bind-Value="loginRequest.Identificador" class="form-control" />
+            <ValidationMessage For="@(() => loginRequest.Identificador)" />
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Senha</label>
+            <InputText type="password" @bind-Value="loginRequest.Senha" class="form-control" />
+            <ValidationMessage For="@(() => loginRequest.Senha)" />
+        </div>
+        
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">
+                @errorMessage
+            </div>
+        }
+        
+        <button type="submit" class="btn btn-primary">Entrar</button>
+    </EditForm>
+</div>
+
+@code {
+    private LoginRequest loginRequest = new LoginRequest();
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Redirect if already logged in
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        errorMessage = string.Empty;
+        
+        var response = await AuthService.LoginAsync(loginRequest);
+        
+        if (response.Sucesso)
+        {
+            // Notify the auth state provider that the state has changed
+            ((CustomAuthStateProvider)AuthStateProvider).NotifyAuthenticationStateChanged();
+            
+            // Redirect to home page
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = response.Mensagem;
+        }
+    }
+}

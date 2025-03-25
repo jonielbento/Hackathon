@@ -1,0 +1,132 @@
+@page "/medicos/{MedicoId:long}"
+@using Hackathon.Web.Models
+@using Hackathon.Web.Services
+@inject IMedicoService MedicoService
+@inject IConsultaService ConsultaService
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+<PageTitle>Detalhes do Médico - MedConsulta</PageTitle>
+
+@if (loading)
+{
+    <p>Carregando informações do médico...</p>
+}
+else if (medico == null)
+{
+    <p>Médico não encontrado.</p>
+}
+else
+{
+    <div class="card">
+        <h2 class="card-title">@medico.Nome</h2>
+        <p><strong>CRM:</strong> @medico.Crm</p>
+        
+        @if (medico.Especialidades.Any())
+        {
+            <div class="mt-4">
+                <h3>Especialidades</h3>
+                <ul>
+                    @foreach (var especialidade in medico.Especialidades)
+                    {
+                        <li>@especialidade.Nome</li>
+                    }
+                </ul>
+            </div>
+        }
+        
+        @if (medico.HorariosTrabalho.Any())
+        {
+            <div class="mt-4">
+                <h3>Horários de Atendimento</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Dia da Semana</th>
+                            <th>Horário Início</th>
+                            <th>Horário Fim</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var horario in medico.HorariosTrabalho.OrderBy(h => h.DiaSemana))
+                        {
+                            <tr>
+                                <td>@GetDiaSemana(horario.DiaSemana)</td>
+                                <td>@horario.HoraInicio.ToString("HH:mm")</td>
+                                <td>@horario.HoraFim.ToString("HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        
+        <div class="mt-4">
+            <button class="btn btn-primary" @onclick="AgendarConsulta">Agendar Consulta</button>
+            <button class="btn btn-secondary" @onclick="VoltarParaLista">Voltar</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public long MedicoId { get; set; }
+
+    private MedicoModel? medico;
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMedico();
+    }
+
+    private async Task LoadMedico()
+    {
+        try
+        {
+            loading = true;
+            medico = await MedicoService.GetMedicoByIdAsync(MedicoId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao carregar médico: {ex.Message}");
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private string GetDiaSemana(DayOfWeek diaSemana)
+    {
+        return diaSemana switch
+        {
+            DayOfWeek.Sunday => "Domingo",
+            DayOfWeek.Monday => "Segunda-feira",
+            DayOfWeek.Tuesday => "Terça-feira",
+            DayOfWeek.Wednesday => "Quarta-feira",
+            DayOfWeek.Thursday => "Quinta-feira",
+            DayOfWeek.Friday => "Sexta-feira",
+            DayOfWeek.Saturday => "Sábado",
+            _ => diaSemana.ToString()
+        };
+    }
+
+    private async Task AgendarConsulta()
+    {
+        // Check if user is authenticated
+        if (!await AuthService.IsAuthenticatedAsync())
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        // Navigate to scheduling page
+        NavigationManager.NavigateTo($"/agendar/{MedicoId}");
+    }
+
+    private void VoltarParaLista()
+    {
+        NavigationManager.NavigateTo("/medicos");
+    }
+}

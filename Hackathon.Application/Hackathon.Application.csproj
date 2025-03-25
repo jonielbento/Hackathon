@@ -6,4 +6,15 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Remove="DataTransfers\Requests\RequestTeste.cs" />
+      <Compile Remove="DataTransfers\Responses\ResponseTeste.cs" />
+      <Compile Remove="Interfaces\InterfaceTeste.cs" />
+      <Compile Remove="Services\ServiceTeste.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Hackathon.Domain\Hackathon.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -1,7 +1,98 @@
 ﻿@page "/"
+@using Hackathon.Web.Services
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
 
-<PageTitle>Home</PageTitle>
+@code {
+    private void NavigateToMedicos()
+    {
+        NavigationManager.NavigateTo("/medicos");
+    }
+    
+    private void NavigateToConsultas()
+    {
+        NavigationManager.NavigateTo("/consultas");
+    }
+    
+    private void NavigateToLogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}
 
-<h1>Hello, world!</h1>
+<PageTitle>Home - MedConsulta</PageTitle>
 
-Welcome to your new app.
+<div class="home-container">
+    <h1 class="home-title">Bem-vindo ao MedConsulta</h1>
+    <p class="home-subtitle">Seu sistema de agendamento de consultas médicas</p>
+    
+    <div class="home-cards">
+        <div class="home-card">
+            <h3>Encontre Médicos</h3>
+            <p>Busque médicos por especialidade e agende sua consulta de forma rápida e fácil.</p>
+            <button class="btn btn-primary" @onclick="NavigateToMedicos">Ver Médicos</button>
+        </div>
+        
+        <AuthorizeView>
+            <Authorized>
+                <div class="home-card">
+                    <h3>Minhas Consultas</h3>
+                    <p>Visualize e gerencie suas consultas agendadas.</p>
+                    <button class="btn btn-primary" @onclick="NavigateToConsultas">Ver Consultas</button>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="home-card">
+                    <h3>Acesse sua Conta</h3>
+                    <p>Faça login para agendar consultas e acompanhar seus agendamentos.</p>
+                    <button class="btn btn-primary" @onclick="NavigateToLogin">Fazer Login</button>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</div>
+
+<style>
+    .home-container {
+        text-align: center;
+        padding: 2rem 0;
+    }
+    
+    .home-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: #0078d4;
+    }
+    
+    .home-subtitle {
+        font-size: 1.25rem;
+        margin-bottom: 3rem;
+        color: #555;
+    }
+    
+    .home-cards {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .home-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        width: 300px;
+        text-align: center;
+    }
+    
+    .home-card h3 {
+        color: #0078d4;
+        margin-bottom: 1rem;
+    }
+    
+    .home-card p {
+        margin-bottom: 1.5rem;
+        color: #555;
+    }
+</style>

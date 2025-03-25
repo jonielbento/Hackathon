@@ -1,0 +1,142 @@
+@page "/consultas"
+@using Hackathon.Web.Models
+@using Hackathon.Web.Services
+@inject IConsultaService ConsultaService
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Minhas Consultas - MedConsulta</PageTitle>
+
+<h2>Minhas Consultas</h2>
+
+<AuthorizeView>
+    <Authorized>
+        @if (loading)
+        {
+            <p>Carregando consultas...</p>
+        }
+        else if (consultas == null || !consultas.Any())
+        {
+            <div class="alert alert-info">
+                <p>Você não possui consultas agendadas.</p>
+                <button class="btn btn-primary" @onclick="NavigateToMedicos">Agendar Consulta</button>
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Médico</th>
+                            <th>Data</th>
+                            <th>Horário</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var consulta in consultas.OrderBy(c => c.DataConsultaInicio))
+                        {
+                            <tr>
+                                <td>@consulta.NomeMedico</td>
+                                <td>@consulta.DataConsultaInicio.ToShortDateString()</td>
+                                <td>@consulta.DataConsultaInicio.ToString("HH:mm") - @consulta.DataConsultaFim.ToString("HH:mm")</td>
+                                <td>R$ @consulta.ValorConsulta.ToString("F2")</td>
+                                <td>@GetStatusText(consulta.Status)</td>
+                                <td>
+                                    @if (consulta.Status == StatusConsulta.Pendente)
+                                    {
+                                        <button class="btn btn-sm btn-danger" @onclick="() => CancelarConsulta(consulta.IdConsulta)">Cancelar</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-warning">
+            <p>Você precisa estar logado para ver suas consultas.</p>
+            <button class="btn btn-primary" @onclick="NavigateToLogin">Fazer Login</button>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private List<ConsultaModel>? consultas;
+    private bool loading = true;
+    private string userType = string.Empty;
+    private long userId = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            userType = await AuthService.GetUserTypeAsync();
+            userId = await AuthService.GetUserIdAsync();
+            await LoadConsultas();
+        }
+        else
+        {
+            loading = false;
+        }
+    }
+
+    private async Task LoadConsultas()
+    {
+        try
+        {
+            loading = true;
+            
+            if (userType == "Medico")
+            {
+                consultas = await ConsultaService.GetConsultasByMedicoAsync(userId);
+            }
+            else // Paciente
+            {
+                consultas = await ConsultaService.GetConsultasByPacienteAsync(userId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao carregar consultas: {ex.Message}");
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private string GetStatusText(StatusConsulta status)
+    {
+        return status switch
+        {
+            StatusConsulta.Pendente => "Pendente",
+            StatusConsulta.Confirmada => "Confirmada",
+            StatusConsulta.Cancelada => "Cancelada",
+            StatusConsulta.Realizada => "Realizada",
+            _ => status.ToString()
+        };
+    }
+
+    private async Task CancelarConsulta(long consultaId)
+    {
+        // This would require an additional API endpoint to cancel a consultation
+        // For now, we'll just reload the consultations
+        await LoadConsultas();
+    }
+    
+    private void NavigateToMedicos()
+    {
+        NavigationManager.NavigateTo("/medicos");
+    }
+    
+    private void NavigateToLogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}

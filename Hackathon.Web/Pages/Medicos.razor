@@ -1,0 +1,77 @@
+@page "/medicos"
+@using Hackathon.Web.Models
+@using Hackathon.Web.Services
+@inject IMedicoService MedicoService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Médicos - MedConsulta</PageTitle>
+
+<h2>Médicos Disponíveis</h2>
+
+@if (loading)
+{
+    <p>Carregando médicos...</p>
+}
+else if (medicos == null || !medicos.Any())
+{
+    <p>Nenhum médico encontrado.</p>
+}
+else
+{
+    <div class="card-grid">
+        @foreach (var medico in medicos)
+        {
+            <div class="card">
+                <h3 class="card-title">@medico.Nome</h3>
+                <p><strong>CRM:</strong> @medico.Crm</p>
+                
+                @if (medico.Especialidades.Any())
+                {
+                    <p><strong>Especialidades:</strong></p>
+                    <ul>
+                        @foreach (var especialidade in medico.Especialidades)
+                        {
+                            <li>@especialidade.Nome</li>
+                        }
+                    </ul>
+                }
+                
+                <button class="btn btn-primary" @onclick="() => NavigateToMedicoDetails(medico.IdMedico)">
+                    Ver Detalhes
+                </button>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<MedicoModel>? medicos;
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMedicos();
+    }
+
+    private async Task LoadMedicos()
+    {
+        try
+        {
+            loading = true;
+            medicos = await MedicoService.GetAllMedicosAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao carregar médicos: {ex.Message}");
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void NavigateToMedicoDetails(long medicoId)
+    {
+        NavigationManager.NavigateTo($"/medicos/{medicoId}");
+    }
+}

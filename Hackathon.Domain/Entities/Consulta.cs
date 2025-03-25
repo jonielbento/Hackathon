@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hackathon.Domain.Entities
 {
@@ -20,6 +21,20 @@ namespace Hackathon.Domain.Entities
         public DateTime DataConsultaFim { get; set; }
 
         [Required]
-        public bool Confirmado { get; set; }
+        public decimal ValorConsulta { get; set; }
+
+        [Required]
+        public StatusConsulta Status { get; set; } = StatusConsulta.Pendente;
+
+        [MaxLength(500)]
+        public string? Justificativa { get; set; }
+    }
+
+    public enum StatusConsulta
+    {
+        Pendente = 0,
+        Confirmada = 1,
+        Recusada = 2,
+        Cancelada = 3
     }
 }

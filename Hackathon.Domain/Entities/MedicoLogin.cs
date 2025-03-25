@@ -14,6 +14,8 @@ namespace Hackathon.Domain.Entities
         [Required, MaxLength(255)]
         public string Senha { get; set; } = string.Empty;
 
+        // O CRM já está na entidade Medico, então podemos acessá-lo através da navegação
+
         public Medico Medico { get; set; } = null!;
     }
 }
