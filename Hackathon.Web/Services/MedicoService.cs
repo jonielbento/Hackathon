@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,6 +12,7 @@ namespace Hackathon.Web.Services
     {
         Task<List<MedicoModel>> GetAllMedicosAsync();
         Task<MedicoModel?> GetMedicoByIdAsync(long id);
+        Task<List<MedicoModel>> BuscarMedicosAsync(BuscarMedicosRequest request);
     }
 
     public class MedicoService : IMedicoService
@@ -44,6 +46,15 @@ namespace Hackathon.Web.Services
         {
             await SetAuthHeaderAsync();
             return await _httpClient.GetFromJsonAsync<MedicoModel>($"api/Medico/{id}");
+        }
+        
+        public async Task<List<MedicoModel>> BuscarMedicosAsync(BuscarMedicosRequest request)
+        {
+            await SetAuthHeaderAsync();
+            var response = await _httpClient.PostAsJsonAsync("api/Medico/buscar", request);
+            response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadFromJsonAsync<List<MedicoModel>>();
+            return result ?? new List<MedicoModel>();
         }
     }
 }

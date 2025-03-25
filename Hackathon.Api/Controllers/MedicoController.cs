@@ -2,6 +2,7 @@ using Hackathon.Application.DataTransfers.Requests;
 using Hackathon.Application.DataTransfers.Responses;
 using Hackathon.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -68,6 +69,13 @@ namespace Hackathon.Api.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+        
+        // POST: api/Medico/buscar
+        [HttpPost("buscar")]
+        public async Task<ActionResult<IEnumerable<MedicoResponse>>> BuscarMedicos(BuscarMedicosRequest request)
+        {
+            return Ok(await _medicoService.BuscarMedicosAsync(request));
         }
     }
 }

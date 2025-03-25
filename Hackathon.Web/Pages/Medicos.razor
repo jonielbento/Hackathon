@@ -1,12 +1,43 @@
 @page "/medicos"
 @using Hackathon.Web.Models
 @using Hackathon.Web.Services
+@using System.Globalization
 @inject IMedicoService MedicoService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Médicos - MedConsulta</PageTitle>
 
 <h2>Médicos Disponíveis</h2>
+
+<div class="search-container mb-4">
+    <h4>Filtrar Médicos</h4>
+    <div class="row">
+        <div class="col-md-4 mb-2">
+            <label for="nomeMedico" class="form-label">Nome do Médico</label>
+            <input type="text" class="form-control" id="nomeMedico" @bind="filtroNome" placeholder="Digite o nome do médico" />
+        </div>
+        <div class="col-md-4 mb-2">
+            <label for="especialidade" class="form-label">Especialidade</label>
+            <select class="form-select" id="especialidade" @bind="filtroEspecialidade">
+                <option value="">Todas as especialidades</option>
+                @foreach (var especialidade in especialidades)
+                {
+                    <option value="@especialidade.IdEspecialidade">@especialidade.Nome</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4 mb-2">
+            <label for="dataDisponivel" class="form-label">Data Disponível</label>
+            <input type="date" class="form-control" id="dataDisponivel" @bind="filtroData" />
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-12">
+            <button class="btn btn-primary" @onclick="BuscarMedicos">Buscar</button>
+            <button class="btn btn-secondary ms-2" @onclick="LimparFiltros">Limpar Filtros</button>
+        </div>
+    </div>
+</div>
 
 @if (loading)
 {
@@ -47,10 +78,17 @@ else
 @code {
     private List<MedicoModel>? medicos;
     private bool loading = true;
+    private List<EspecialidadeModel> especialidades = new List<EspecialidadeModel>();
+    
+    // Filtros
+    private string? filtroNome;
+    private string? filtroEspecialidade;
+    private DateTime? filtroData;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadMedicos();
+        await CarregarEspecialidades();
     }
 
     private async Task LoadMedicos()
@@ -68,6 +106,60 @@ else
         {
             loading = false;
         }
+    }
+    
+    private async Task CarregarEspecialidades()
+    {
+        // Extrair especialidades únicas dos médicos carregados
+        if (medicos != null && medicos.Any())
+        {
+            var todasEspecialidades = new List<EspecialidadeModel>();
+            foreach (var medico in medicos)
+            {
+                todasEspecialidades.AddRange(medico.Especialidades);
+            }
+            
+            // Remover duplicatas
+            especialidades = todasEspecialidades
+                .GroupBy(e => e.IdEspecialidade)
+                .Select(g => g.First())
+                .OrderBy(e => e.Nome)
+                .ToList();
+        }
+    }
+    
+    private async Task BuscarMedicos()
+    {
+        try
+        {
+            loading = true;
+            
+            var request = new BuscarMedicosRequest
+            {
+                Nome = filtroNome,
+                IdEspecialidade = !string.IsNullOrEmpty(filtroEspecialidade) ? long.Parse(filtroEspecialidade) : null,
+                DataDisponivel = filtroData
+            };
+            
+            medicos = await MedicoService.BuscarMedicosAsync(request);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao buscar médicos: {ex.Message}");
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+    
+    private async Task LimparFiltros()
+    {
+        filtroNome = null;
+        filtroEspecialidade = null;
+        filtroData = null;
+        
+        await LoadMedicos();
     }
 
     private void NavigateToMedicoDetails(long medicoId)

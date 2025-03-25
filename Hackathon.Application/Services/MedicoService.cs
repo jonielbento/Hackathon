@@ -73,6 +73,37 @@ namespace Hackathon.Application.Services
         {
             return await _medicoRepository.DeleteAsync(id);
         }
+        
+        public async Task<IEnumerable<MedicoResponse>> BuscarMedicosAsync(BuscarMedicosRequest request)
+        {
+            var medicos = await _medicoRepository.GetAllAsync();
+            var query = medicos.AsQueryable();
+            
+            // Filtrar por nome se fornecido
+            if (!string.IsNullOrWhiteSpace(request.Nome))
+            {
+                query = query.Where(m => m.Nome.Contains(request.Nome, StringComparison.OrdinalIgnoreCase));
+            }
+            
+            // Filtrar por especialidade se fornecida
+            if (request.IdEspecialidade.HasValue)
+            {
+                query = query.Where(m => m.MedicoEspecialidades.Any(me => me.IdEspecialidade == request.IdEspecialidade.Value));
+            }
+            
+            // Filtrar por data disponível se fornecida
+            if (request.DataDisponivel.HasValue)
+            {
+                var data = request.DataDisponivel.Value.Date;
+                var diaSemana = data.DayOfWeek;
+                
+                query = query.Where(m => m.HorariosTrabalho.Any(ht => 
+                    ht.DiaTrabalho.Date == data || 
+                    (ht.DiaTrabalho.DayOfWeek == diaSemana && ht.DiaTrabalho.Date <= data)));
+            }
+            
+            return query.Select(MapToMedicoResponse).ToList();
+        }
 
         private MedicoResponse MapToMedicoResponse(Medico medico)
         {
